@@ -16,9 +16,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => {
-      if (!users) {
-        throw errNotFound('Пользователи не найдены');
-      }
+      if (!users) throw errNotFound('Пользователи не найдены');
       res.send(users);
     })
     .catch(next);
@@ -27,9 +25,7 @@ export const getUsers = (req: Request, res: Response, next: NextFunction) => {
 export const getUser = (req: Request, res: Response, next: NextFunction) => {
   User.findOne({ _id: req.params.userId })
     .then((user) => {
-      if (!user) {
-        throw errNotFound('Запрашиваемый пользователь не найден');
-      }
+      if (!user) throw errNotFound('Запрашиваемый пользователь не найден');
       res.send(user);
     })
     .catch(next);
@@ -45,9 +41,7 @@ export const updateProfile = (
 
   User.findByIdAndUpdate(_id, { name, about }, { new: true })
     .then((user) => {
-      if (!user) {
-        throw errNotFound('Запрашиваемый пользователь не найден');
-      }
+      if (!user) throw errNotFound('Запрашиваемый пользователь не найден');
       res.send(user);
     })
     .catch((err: Error) => {
@@ -66,9 +60,7 @@ export const updateAvatar = (
 
   User.findByIdAndUpdate(_id, { avatar }, { new: true })
     .then((user) => {
-      if (!user) {
-        throw errNotFound('Запрашиваемый пользователь не найден');
-      }
+      if (!user) throw errNotFound('Запрашиваемый пользователь не найден');
       res.send(user);
     })
     .catch((err: Error) => {
