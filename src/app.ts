@@ -9,10 +9,14 @@ import router from './routes/router';
 
 dotenv.config();
 
-const { PORT = 3000, NAME_API = '/' } = process.env;
+const {
+  PORT = 3000,
+  NAME_API = '/',
+  URL_DB = 'mongodb://localhost:27017/mestodb',
+} = process.env;
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/mestodb');
+mongoose.connect(URL_DB);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

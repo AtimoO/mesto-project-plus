@@ -7,9 +7,7 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => {
-      if (!cards) {
-        throw errNotFound('Карточки не найдены');
-      }
+      if (!cards) throw errNotFound('Карточки не найдены');
       res.send(cards);
     })
     .catch(next);
@@ -29,12 +27,18 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
+  const { _id } = req.user;
+
+  Card.findById(cardId)
     .then((card) => {
-      if (!card) {
-        throw errNotFound('Запрашиваемая карточка не найдена');
+      if (!card) throw errNotFound('Запрашиваемая карточка не найдена');
+      if (card.owner.toString() === _id) {
+        Card.findByIdAndRemove(cardId)
+          .then((deletedCard) => res.send(deletedCard))
+          .catch(next);
+      } else {
+        throw errBadRequest('Нельзя удалить чужую карточку');
       }
-      res.send(card);
     })
     .catch(next);
 };
@@ -50,9 +54,7 @@ export const setLikeCard = (
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: _id } }, { new: true })
     .populate(['owner', 'likes'])
     .then((card) => {
-      if (!card) {
-        throw errNotFound('Запрашиваемая карточка не найдена');
-      }
+      if (!card) throw errNotFound('Запрашиваемая карточка не найдена');
       res.send(card);
     })
     .catch(next);
