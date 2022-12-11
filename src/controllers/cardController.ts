@@ -1,60 +1,78 @@
 import { ObjectId } from 'mongoose';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { errBadRequest, errNotFound } from '../errors/customError';
 import Card from '../models/card';
-import { SessionRequest } from '../utils/types';
 
-export const getCards = (req: Request, res: Response) => {
+export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
     .populate(['owner', 'likes'])
-    .then((cards) => res.send({ data: cards }))
-    .catch((err) => {
-      res.status(400).send({ message: err.message });
+    .then((cards) => {
+      if (!cards) {
+        throw errNotFound('Карточки не найдены');
+      }
+      res.send(cards);
+    })
+    .catch(next);
+};
+
+export const createCard = (req: Request, res: Response, next: NextFunction) => {
+  const { name, link } = req.body;
+  const { _id } = req.user;
+
+  Card.create({ name, link, owner: _id })
+    .then((card) => res.send(card))
+    .catch((err: Error) => {
+      const error = err.name === 'ValidationError' ? errBadRequest('Некорректно введены данные') : err;
+      next(error);
     });
 };
 
-export const createCard = (req: SessionRequest, res: Response) => {
-  const { name, link } = req.body;
-  // временное решение для _id
-  if (typeof req.user === 'object' && Object.keys(req.user).includes('_id')) {
-    const { _id } = req.user;
-
-    Card.create({ name, link, owner: _id })
-      .then((card) => res.send({ data: card }))
-      .catch((err) => res.status(400).send({ message: err.message }));
-  }
-};
-
-export const deleteCard = (req: Request, res: Response) => {
+export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .then((card) => {
-      res.send({ data: card });
+      if (!card) {
+        throw errNotFound('Запрашиваемая карточка не найдена');
+      }
+      res.send(card);
     })
-    .catch((err) => {
-      res.status(500).send({ message: err.message });
-    });
+    .catch(next);
 };
 
-export const setLikeCard = (req: SessionRequest, res: Response) => {
+export const setLikeCard = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { cardId } = req.params;
-  if (typeof req.user === 'object' && Object.keys(req.user).includes('_id')) {
-    const { _id } = req.user;
+  const { _id } = req.user;
 
-    Card.findByIdAndUpdate(cardId, { $addToSet: { likes: _id } }, { new: true })
-      .populate(['owner', 'likes'])
-      .then((card) => res.send({ data: card }))
-      .catch((err) => res.status(400).send({ message: err.message }));
-  }
+  Card.findByIdAndUpdate(cardId, { $addToSet: { likes: _id } }, { new: true })
+    .populate(['owner', 'likes'])
+    .then((card) => {
+      if (!card) {
+        throw errNotFound('Запрашиваемая карточка не найдена');
+      }
+      res.send(card);
+    })
+    .catch(next);
 };
 
-export const deleteLikeCard = (req: SessionRequest, res: Response) => {
+export const deleteLikeCard = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const { cardId } = req.params;
-  if (typeof req.user === 'object' && Object.keys(req.user).includes('_id')) {
-    const { _id } = req.user;
+  const id = req.user._id as ObjectId;
 
-    Card.findByIdAndUpdate(cardId, { $pull: { likes: _id as ObjectId } }, { new: true })
-      .populate(['owner', 'likes'])
-      .then((card) => res.send(card))
-      .catch((err) => res.status(400).send({ message: err.message }));
-  }
+  Card.findByIdAndUpdate(cardId, { $pull: { likes: id } }, { new: true })
+    .populate(['owner', 'likes'])
+    .then((card) => {
+      if (!card) {
+        throw errNotFound('Запрашиваемая карточка не найдена');
+      }
+      res.send(card);
+    })
+    .catch(next);
 };

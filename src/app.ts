@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import path from 'path';
 import { errors } from 'celebrate';
 import auth from './middlewares/auth';
+import errorMiddleware from './middlewares/errorMiddleware';
 import router from './routes/router';
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(NAME_API, router);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(errors());
+app.use(errorMiddleware);
 
 app.listen(+PORT, () => {
   console.log('Run server on port', PORT);

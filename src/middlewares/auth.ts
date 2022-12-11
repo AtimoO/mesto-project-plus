@@ -1,7 +1,6 @@
-import { NextFunction, Response } from 'express';
-import { SessionRequest } from '../utils/types';
+import { NextFunction, Request, Response } from 'express';
 
-export default (req: SessionRequest, res: Response, next: NextFunction) => {
+export default (req: Request, res: Response, next: NextFunction) => {
   req.user = {
     _id: '639475ce27166bed4e98868d',
   };
