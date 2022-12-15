@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongoose';
 import { NextFunction, Request, Response } from 'express';
-import { errBadRequest, errNotFound } from '../errors/customError';
+import { errBadRequest, errForbidden, errNotFound } from '../errors/customError';
 import Card from '../models/card';
 
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
@@ -37,7 +37,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
           .then((deletedCard) => res.send(deletedCard))
           .catch(next);
       } else {
-        throw errBadRequest('Нельзя удалить чужую карточку');
+        throw errForbidden('Нельзя удалить чужую карточку');
       }
     })
     .catch(next);
