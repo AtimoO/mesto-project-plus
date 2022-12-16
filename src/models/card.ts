@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { validationCard } from '../validations';
+import { validationCard } from '../validations/schemeValidate';
 import { ICard } from '../utils/types';
 
 const cardSchema = new mongoose.Schema<ICard>({
