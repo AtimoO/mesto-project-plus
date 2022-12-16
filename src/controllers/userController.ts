@@ -47,11 +47,6 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
         { expiresIn: '7d' },
       );
 
-      // res.cookie('jwt', token, {
-      //   maxAge: 3600 * 24 * 7,
-      //   httpOnly: true,
-      //   sameSite: true,
-      // }).end();
       res.send({ token });
     })
     .catch(next);
