@@ -28,6 +28,9 @@ trim_trailing_whitespace = true
 # Quote type
 quote_type = single
 
+# Max line length
+max_line_length = 100
+
 [*.md]
 trim_trailing_whitespace = false
 
