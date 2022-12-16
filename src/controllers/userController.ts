@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
 import { errBadRequest, errConflict, errNotFound } from '../errors/customError';
+import { SessionRequestAuth } from '../utils/types';
 
 const { NODE_ENV = 'production', JWT_SECRET = 'secret-key', SALT = 5 } = process.env;
 
@@ -46,15 +47,18 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
         { expiresIn: '7d' },
       );
 
+      // res.cookie('jwt', token, {
+      //   maxAge: 3600 * 24 * 7,
+      //   httpOnly: true,
+      //   sameSite: true,
+      // }).end();
       res.send({ token });
     })
     .catch(next);
 };
 
-export const getUsers = (req: Request, res: Response, next: NextFunction) => {
-  User.find({}, {
-    email: 1, name: 1, about: 1, avatar: 1,
-  })
+export const getUsers = (req: SessionRequestAuth, res: Response, next: NextFunction) => {
+  User.find({})
     .then((users) => {
       if (!users) throw errNotFound('Пользователи не найдены');
       res.send(users);
@@ -62,10 +66,8 @@ export const getUsers = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-export const getUser = (req: Request, res: Response, next: NextFunction) => {
-  User.findOne({ _id: req.params.userId }, {
-    email: 1, name: 1, about: 1, avatar: 1,
-  })
+export const getUser = (req: SessionRequestAuth, res: Response, next: NextFunction) => {
+  User.findOne({ _id: req.params.userId })
     .then((user) => {
       if (!user) throw errNotFound('Запрашиваемый пользователь не найден');
       res.send(user);
@@ -73,11 +75,11 @@ export const getUser = (req: Request, res: Response, next: NextFunction) => {
     .catch(next);
 };
 
-export const updateProfile = (req: Request, res: Response, next: NextFunction) => {
+export const updateProfile = (req: SessionRequestAuth, res: Response, next: NextFunction) => {
   const { name, about } = req.body;
-  const { _id } = req.user;
+  const idUser = req.user?._id;
 
-  User.findByIdAndUpdate(_id, { name, about }, { new: true })
+  User.findByIdAndUpdate(idUser, { name, about }, { new: true })
     .then((user) => {
       if (!user) throw errNotFound('Запрашиваемый пользователь не найден');
       res.send(user);
@@ -89,11 +91,11 @@ export const updateProfile = (req: Request, res: Response, next: NextFunction) =
     });
 };
 
-export const updateAvatar = (req: Request, res: Response, next: NextFunction) => {
+export const updateAvatar = (req: SessionRequestAuth, res: Response, next: NextFunction) => {
   const { avatar } = req.body;
-  const { _id } = req.user;
+  const idUser = req.user?._id;
 
-  User.findByIdAndUpdate(_id, { avatar }, { new: true })
+  User.findByIdAndUpdate(idUser, { avatar }, { new: true })
     .then((user) => {
       if (!user) throw errNotFound('Запрашиваемый пользователь не найден');
       res.send(user);

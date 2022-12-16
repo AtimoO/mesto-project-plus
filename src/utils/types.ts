@@ -1,4 +1,5 @@
-// import { JwtPayload } from 'jsonwebtoken';
+import { Request } from 'express';
+import { JwtPayload } from 'jsonwebtoken';
 import { Model, Document } from 'mongoose';
 
 export interface IUser {
@@ -20,4 +21,14 @@ export interface ICard {
   owner: IUser;
   likes: Array<IUser> | [];
   createdAt: Date;
+}
+
+export interface SessionRequest extends Request {
+  user?: string | JwtPayload;
+}
+
+export interface SessionRequestAuth extends Request {
+  user?: {
+    _id: string;
+  };
 }

@@ -13,9 +13,7 @@ const handleError = (
     customError = errIntServer('На сервере произошла ошибка');
   }
 
-  res
-    .status((customError as CustomError).status)
-    .send({ message: customError.message });
+  res.status((customError as CustomError).status).send({ message: customError.message });
   return next();
 };
 

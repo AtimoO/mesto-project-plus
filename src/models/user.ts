@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
     type: String,
     required: true,
     minlength: 8,
+    select: false,
   },
   name: {
     type: String,
@@ -40,13 +41,15 @@ const userSchema = new mongoose.Schema<IUser, IUserModel>({
 userSchema.static(
   'findUserByCredentials',
   function findUserByCredentials(email: string, password: string) {
-    return this.findOne({ email }).then((user) => {
-      if (!user) return Promise.reject(errUnauthorized('Неправильные почта или пароль'));
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) return Promise.reject(errUnauthorized('Неправильные почта или пароль'));
-        return user;
+    return this.findOne({ email })
+      .select('+password')
+      .then((user) => {
+        if (!user) return Promise.reject(errUnauthorized('Неправильные почта или пароль'));
+        return bcrypt.compare(password, user.password).then((matched) => {
+          if (!matched) return Promise.reject(errUnauthorized('Неправильные почта или пароль'));
+          return user;
+        });
       });
-    });
   },
 );
 

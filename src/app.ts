@@ -10,11 +10,7 @@ import { createUser, login } from './controllers/userController';
 
 dotenv.config();
 
-const {
-  PORT = 3000,
-  NAME_API = '',
-  URL_DB = 'mongodb://localhost:27017/mestodb',
-} = process.env;
+const { PORT = 3000, NAME_API = '', URL_DB = 'mongodb://localhost:27017/mestodb' } = process.env;
 const app = express();
 
 mongoose.connect(URL_DB);
