@@ -8,6 +8,7 @@ import router from './routes/router';
 import errorMiddleware from './middlewares/errorMiddleware';
 import { createUser, login } from './controllers/userController';
 import { errorLogger, requestLogger } from './middlewares/logger';
+import { createUserValidate, loginValidate } from './validations/userValidate';
 
 dotenv.config();
 
@@ -21,8 +22,8 @@ app.use(requestLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post(`${NAME_API}/singin`, login);
-app.post(`${NAME_API}/signup`, createUser);
+app.post(`${NAME_API}/singin`, loginValidate, login);
+app.post(`${NAME_API}/signup`, createUserValidate, createUser);
 
 app.use(auth);
 

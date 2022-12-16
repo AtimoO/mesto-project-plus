@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import { validationUser } from '../validations';
+import { validationUser } from '../validations/schemeValidate';
 import { errUnauthorized } from '../errors/customError';
 import { IUser, IUserModel } from '../utils/types';
 

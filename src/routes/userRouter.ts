@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { updateAvatarProfile, updateProfileValidate } from '../validations/userValidate';
 import {
   getUser,
   getUsers,
@@ -10,7 +11,7 @@ const router = Router();
 
 router.get('/', getUsers);
 router.get('/:userId', getUser);
-router.patch('/me', updateProfile);
-router.patch('/me/avatar', updateAvatar);
+router.patch('/me', updateProfileValidate, updateProfile);
+router.patch('/me/avatar', updateAvatarProfile, updateAvatar);
 
 export default router;
